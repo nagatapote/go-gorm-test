@@ -4,10 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"go-todo-test/models"
+	"go-todo-test/domain/models"
+	"log"
 	"net/http"
 	"os"
-	"time"
+
+	"go-todo-test/infrastructure/db"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -16,9 +18,23 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
+const defaultPort = "8080"
+
+func envLoad() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file", err)
+	}
+}
+
 func main() {
-	initDB()
-	insert()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = defaultPort
+		envLoad()
+	}
+	db.Init()
+	// insert()
 
 	engine := gin.Default()
 	engine.GET("/", func(c *gin.Context) {
@@ -27,36 +43,7 @@ func main() {
 		})
 	})
 
-	engine.Run(":3000")
-}
-
-func initDB() {
-
-	err := godotenv.Load(".env")
-	if err != nil {
-		panic(err)
-	}
-	DBUser := os.Getenv("DB_USER")
-	DBPass := os.Getenv("DB_PASS")
-
-	dns := "host=localhost port=5432 dbname=sample_database user=" + DBUser + " password=" + DBPass + " sslmode=disable"
-
-	db, err := sql.Open("postgres", dns)
-
-	if err != nil {
-		panic(err)
-	}
-
-	// connection pool settings
-	db.SetMaxIdleConns(10)
-	db.SetMaxOpenConns(10)
-	db.SetConnMaxLifetime(300 * time.Second)
-
-	// global connection setting
-	boil.SetDB(db)
-	boil.DebugMode = true
-
-	fmt.Println("data base ok")
+	engine.Run(":" + port)
 }
 
 func insert() {
