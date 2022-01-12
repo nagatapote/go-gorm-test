@@ -1,10 +1,6 @@
 package main
 
 import (
-	"context"
-	"database/sql"
-	"fmt"
-	"go-todo-test/domain/models"
 	"log"
 	"net/http"
 	"os"
@@ -14,8 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"github.com/volatiletech/null/v8"
-	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
 const defaultPort = "8080"
@@ -46,27 +40,27 @@ func main() {
 	engine.Run(":" + port)
 }
 
-func insert() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		panic(err)
-	}
-	DBUser := os.Getenv("DB_USER")
-	DBPass := os.Getenv("DB_PASS")
+// func insert() {
+// 	err := godotenv.Load(".env")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	DBUser := os.Getenv("DB_USER")
+// 	DBPass := os.Getenv("DB_PASS")
 
-	dns := "host=localhost port=5432 dbname=sample_database user=" + DBUser + " password=" + DBPass + " sslmode=disable"
+// 	dns := "host=localhost port=5432 dbname=sample_database user=" + DBUser + " password=" + DBPass + " sslmode=disable"
 
-	db, err := sql.Open("postgres", dns)
+// 	db, err := sql.Open("postgres", dns)
 
-	if err != nil {
-		panic(err)
-	}
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	user := models.User{
-		Email:          null.StringFrom("test@example.com"),
-		PasswordDigest: null.StringFrom("digested-password"),
-	}
-	fmt.Printf("before user = %+v\n", user)
-	user.Insert(context.Background(), db, boil.Infer())
-	fmt.Printf("after user = %+v\n", user)
-}
+// 	user := models.User{
+// 		Email:          null.StringFrom("test@example.com"),
+// 		PasswordDigest: null.StringFrom("digested-password"),
+// 	}
+// 	fmt.Printf("before user = %+v\n", user)
+// 	user.Insert(context.Background(), db, boil.Infer())
+// 	fmt.Printf("after user = %+v\n", user)
+// }
