@@ -28,7 +28,6 @@ func main() {
 		envLoad()
 	}
 	db.Init()
-	// insert()
 
 	engine := gin.Default()
 	engine.GET("/", func(c *gin.Context) {
@@ -39,28 +38,3 @@ func main() {
 
 	engine.Run(":" + port)
 }
-
-// func insert() {
-// 	err := godotenv.Load(".env")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	DBUser := os.Getenv("DB_USER")
-// 	DBPass := os.Getenv("DB_PASS")
-
-// 	dns := "host=localhost port=5432 dbname=sample_database user=" + DBUser + " password=" + DBPass + " sslmode=disable"
-
-// 	db, err := sql.Open("postgres", dns)
-
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	user := models.User{
-// 		Email:          null.StringFrom("test@example.com"),
-// 		PasswordDigest: null.StringFrom("digested-password"),
-// 	}
-// 	fmt.Printf("before user = %+v\n", user)
-// 	user.Insert(context.Background(), db, boil.Infer())
-// 	fmt.Printf("after user = %+v\n", user)
-// }
