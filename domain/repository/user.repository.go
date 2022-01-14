@@ -19,3 +19,14 @@ func insert() {
 	user.Insert(context.Background(), db.DB, boil.Infer())
 	fmt.Printf("after user = %+v\n", user)
 }
+
+func update() {
+	user := models.User{ID: 1}
+	user.Email = null.StringFrom("update@example.com")
+	user.Update(context.Background(), db.DB, boil.Infer())
+}
+
+func delete() {
+	user := models.User{ID: 1}
+	user.Delete(context.Background(), db.DB)
+}
