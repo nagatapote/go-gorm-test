@@ -2,31 +2,53 @@ package repository
 
 import (
 	"context"
-	"fmt"
-	"go-todo-test/domain/models"
-	"go-todo-test/infrastructure/db"
-
-	"github.com/volatiletech/null/v8"
-	"github.com/volatiletech/sqlboiler/v4/boil"
+	"database/sql"
+	"go-sqlboiler-test/domain/models"
+	"go-sqlboiler-test/infrastructure/db"
 )
 
-func insert() {
-	user := models.User{
-		Email:          null.StringFrom("test@example.com"),
-		PasswordDigest: null.StringFrom("digested-password"),
-	}
-	fmt.Printf("before user = %+v\n", user)
-	user.Insert(context.Background(), db.DB, boil.Infer())
-	fmt.Printf("after user = %+v\n", user)
+type UserRepository interface {
+	UserGet() (*models.UserSlice, error)
+	// UserPost(ID float64, Email string) (*models.User, error)
+	// UserPut(ID float64) (*models.User, error)
+	// UserDelete(ID float64) (*models.User, error)
 }
 
-func update() {
-	user := models.User{ID: 1}
-	user.Email = null.StringFrom("update@example.com")
-	user.Update(context.Background(), db.DB, boil.Infer())
+type userRepositoryImpl struct {
+	db *sql.DB
 }
 
-func delete() {
-	user := models.User{ID: 1}
-	user.Delete(context.Background(), db.DB)
+func NewUserRepository(db *sql.DB) UserRepository {
+	return &userRepositoryImpl{db}
 }
+
+func (ur *userRepositoryImpl) UserGet() (*models.UserSlice, error) {
+	user, _ := models.Users().All(context.Background(), db.DB)
+
+	return &user, nil
+}
+
+// func (ur *userRepositoryImpl) UserPost(ID float64, Email string) (*models.User, error) {
+// 	user := models.User{
+// 		Email:          null.StringFrom("test@example.com"),
+// 		PasswordDigest: null.StringFrom("digested-password"),
+// 	}
+// 	user.Insert(context.Background(), db.DB, boil.Infer())
+
+// 	return &user, nil
+// }
+
+// func (ur *userRepositoryImpl) UserPut(ID float64) (*models.User, error) {
+// 	user := models.User{ID: 1}
+// 	user.Email = null.StringFrom("update@example.com")
+// 	user.Update(context.Background(), db.DB, boil.Infer())
+
+// 	return &user, nil
+// }
+
+// func (ur *userRepositoryImpl) UserDelete(ID float64) (*models.User, error) {
+// 	user := models.User{ID: 1}
+// 	user.Delete(context.Background(), db.DB)
+
+// 	return &user, nil
+// }

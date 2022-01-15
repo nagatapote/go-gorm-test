@@ -5,10 +5,16 @@ import (
 	"net/http"
 	"os"
 
-	"go-todo-test/infrastructure/db"
+	"go-sqlboiler-test/domain/repository"
+	"go-sqlboiler-test/infrastructure/db"
+	"go-sqlboiler-test/infrastructure/route"
+	"go-sqlboiler-test/interface/controllers"
+	"go-sqlboiler-test/usecase"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	_ "github.com/lib/pq"
 )
 
@@ -35,6 +41,18 @@ func main() {
 			"message": "hello world",
 		})
 	})
+
+	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	userRepository := repository.NewUserRepository(db.DB)
+	userUseCase := usecase.NewUserUseCase(userRepository)
+	userController := controllers.NewUserController(userUseCase)
+	userRouter := route.NewUserRouter(userController)
+	indexRouter := route.NewIndexRouter(userRouter)
+
+	indexRouter.Routing(e)
 
 	engine.Run(":" + port)
 }
