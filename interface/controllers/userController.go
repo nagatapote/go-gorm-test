@@ -46,10 +46,13 @@ func (uc userController) UserGet(c echo.Context) (err error) {
 }
 
 func (uc userController) UserPost(c echo.Context) (err error) {
-	up := &userpost{
-		Email:          c.FormValue("email"),
-		PasswordDigest: c.FormValue("password"),
-	}
+	// up := &userpost{
+	// 	Email:          c.FormValue("email"),
+	// 	PasswordDigest: c.FormValue("password"),
+	// }
+
+	//NOTE: body content type application/jsonであれば、post dataをこれで受け取れる。
+	up := new(userpost)
 	err = util.BindValidate(c, up)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, util.ErrorNoParameter)
