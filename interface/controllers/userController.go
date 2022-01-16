@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"go-sqlboiler-test/domain/models"
-	"go-sqlboiler-test/usecase"
+	"go-gorm-test/domain/models"
+	"go-gorm-test/usecase"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -23,6 +23,12 @@ func NewUserController(cuu usecase.UserUseCase) UserController {
 	return userController{cuu}
 }
 
+type (
+	userdelete struct {
+		ID int
+	}
+)
+
 func (uc userController) UserGet(c echo.Context) (err error) {
 	post, statuscode, err := uc.Cuu.UserGetUseCase()
 	if err != nil {
@@ -33,3 +39,15 @@ func (uc userController) UserGet(c echo.Context) (err error) {
 	}
 	return c.JSON(http.StatusOK, post)
 }
+
+// func (uc userController) UserDelete(c echo.Context) (err error) {
+// 	ud := new(userdelete)
+// 	post, statuscode, err := uc.Cuu.UserDeleteUseCase(ud.ID)
+// 	if err != nil {
+// 		message := models.Message{
+// 			Message: err.Error(),
+// 		}
+// 		return echo.NewHTTPError(statuscode, message)
+// 	}
+// 	return c.JSON(http.StatusOK, post)
+// }

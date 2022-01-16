@@ -1,7 +1,7 @@
 package route
 
 import (
-	"go-sqlboiler-test/interface/controllers"
+	"go-gorm-test/interface/controllers"
 
 	"github.com/labstack/echo"
 )
@@ -20,8 +20,8 @@ func NewUserRouter(uc controllers.UserController) UserRouter {
 
 func (ur userRouter) UserRouting(e *echo.Echo) {
 	r := e.Group("/user")
-	r.GET("/", ur.Uc.UserGet)
+	r.GET("/all", ur.Uc.UserGet)
 	// r.POST("/")
 	// r.PUT("/")
-	// r.DELETE("/")
+	// r.DELETE("/delete", ur.Uc.UserDelete)
 }

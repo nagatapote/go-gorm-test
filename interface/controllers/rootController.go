@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"go-sqlboiler-test/domain/models"
+	"go-gorm-test/domain/models"
 	"net/http"
 
 	"github.com/labstack/echo"

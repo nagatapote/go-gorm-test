@@ -1,7 +1,7 @@
 package route
 
 import (
-	"go-sqlboiler-test/interface/controllers"
+	"go-gorm-test/interface/controllers"
 
 	"github.com/labstack/echo"
 )

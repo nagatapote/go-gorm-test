@@ -2,16 +2,14 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 
-	"go-sqlboiler-test/domain/repository"
-	"go-sqlboiler-test/infrastructure/db"
-	"go-sqlboiler-test/infrastructure/route"
-	"go-sqlboiler-test/interface/controllers"
-	"go-sqlboiler-test/usecase"
+	"go-gorm-test/domain/repository"
+	"go-gorm-test/infrastructure/db"
+	"go-gorm-test/infrastructure/route"
+	"go-gorm-test/interface/controllers"
+	"go-gorm-test/usecase"
 
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -33,19 +31,14 @@ func main() {
 		port = defaultPort
 		envLoad()
 	}
-	db.Init()
-
-	engine := gin.Default()
-	engine.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "hello world",
-		})
-	})
+	db.Open()
+	defer db.Close()
 
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	// DI
 	userRepository := repository.NewUserRepository(db.DB)
 	userUseCase := usecase.NewUserUseCase(userRepository)
 	userController := controllers.NewUserController(userUseCase)
@@ -54,5 +47,5 @@ func main() {
 
 	indexRouter.Routing(e)
 
-	engine.Run(":" + port)
+	e.Logger.Fatal(e.Start(":" + port))
 }
