@@ -2,14 +2,13 @@ package repository
 
 import (
 	"go-gorm-test/domain/models"
-	"log"
 
 	"github.com/jinzhu/gorm"
 )
 
 type UserRepository interface {
 	UserGet() (*[]models.User, error)
-	// UserPost(ID int, Email string) (*models.User, error)
+	UserPost(Email string, PasswordDigest string) (*models.User, error)
 	// UserPut(ID int) (*models.User, error)
 	// UserDelete(ID int) (*models.User, error)
 }
@@ -28,19 +27,19 @@ func (ur *userRepositoryImpl) UserGet() (*[]models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Print("ここまでOK")
 	return &findUsers, nil
 }
 
-// func (ur *userRepositoryImpl) UserPost(ID int, Email string) (*models.User, error) {
-// 	user := models.User{
-// 		Email:          null.StringFrom("test@example.com"),
-// 		PasswordDigest: null.StringFrom("digested-password"),
-// 	}
-// 	user.Insert(context.Background(), db.DB, boil.Infer())
-
-// 	return &user, nil
-// }
+func (ur *userRepositoryImpl) UserPost(Email string, PasswordDigest string) (*models.User, error) {
+	insertUser := models.User{}
+	insertUser.Email = Email
+	insertUser.PasswordDigest = PasswordDigest
+	err := ur.db.Create(&insertUser).Error
+	if err != nil {
+		return nil, err
+	}
+	return &insertUser, nil
+}
 
 // func (ur *userRepositoryImpl) UserPut(ID int) (*models.User, error) {
 // 	user := models.User{ID: 1}

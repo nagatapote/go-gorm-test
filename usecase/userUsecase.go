@@ -8,7 +8,7 @@ import (
 
 type UserUseCase interface {
 	UserGetUseCase() (resp interface{}, statuscode int, err error)
-	// UserPostUseCase(ID int, Email string) (resp interface{}, statuscode int, err error)
+	UserPostUseCase(Email string, PasswordDigest string) (resp interface{}, statuscode int, err error)
 	// UserPutUseCase(ID int) (resp interface{}, statuscode int, err error)
 	// UserDeleteUseCase(ID int) (resp interface{}, statuscode int, err error)
 }
@@ -23,6 +23,14 @@ func NewUserUseCase(ur repository.UserRepository) UserUseCase {
 
 func (uu userUseCaceImpl) UserGetUseCase() (resp interface{}, statuscode int, err error) {
 	resp, err = uu.Ur.UserGet()
+	if err != nil {
+		return nil, http.StatusInternalServerError, util.ErrorServerError
+	}
+	return resp, http.StatusOK, nil
+}
+
+func (uu userUseCaceImpl) UserPostUseCase(Email string, PasswordDigest string) (resp interface{}, statuscode int, err error) {
+	resp, err = uu.Ur.UserPost(Email, PasswordDigest)
 	if err != nil {
 		return nil, http.StatusInternalServerError, util.ErrorServerError
 	}

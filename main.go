@@ -9,7 +9,9 @@ import (
 	"go-gorm-test/infrastructure/route"
 	"go-gorm-test/interface/controllers"
 	"go-gorm-test/usecase"
+	"go-gorm-test/util"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -37,6 +39,7 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Validator = &util.CustomValidator{Validator: validator.New()}
 
 	// DI
 	userRepository := repository.NewUserRepository(db.DB)

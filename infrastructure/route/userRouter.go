@@ -21,7 +21,7 @@ func NewUserRouter(uc controllers.UserController) UserRouter {
 func (ur userRouter) UserRouting(e *echo.Echo) {
 	r := e.Group("/user")
 	r.GET("/all", ur.Uc.UserGet)
-	// r.POST("/")
+	r.POST("/create", ur.Uc.UserPost)
 	// r.PUT("/")
 	// r.DELETE("/delete", ur.Uc.UserDelete)
 }
