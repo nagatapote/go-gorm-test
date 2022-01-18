@@ -22,6 +22,6 @@ func (ur userRouter) UserRouting(e *echo.Echo) {
 	r := e.Group("/user")
 	r.GET("/all", ur.Uc.UserGet)
 	r.POST("/create", ur.Uc.UserPost)
-	// r.PUT("/")
+	r.PUT("/update/:id", ur.Uc.UserUpdate)
 	// r.DELETE("/delete", ur.Uc.UserDelete)
 }

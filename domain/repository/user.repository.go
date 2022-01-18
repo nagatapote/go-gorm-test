@@ -9,7 +9,7 @@ import (
 type UserRepository interface {
 	UserGet() (*[]models.User, error)
 	UserPost(Email string, PasswordDigest string) (*models.User, error)
-	// UserPut(ID int) (*models.User, error)
+	UserUpdate(ID int, Email string, PasswordDigest string) (*models.User, error)
 	// UserDelete(ID int) (*models.User, error)
 }
 
@@ -39,6 +39,26 @@ func (ur *userRepositoryImpl) UserPost(Email string, PasswordDigest string) (*mo
 		return nil, err
 	}
 	return &insertUser, nil
+}
+
+func (ur *userRepositoryImpl) UserUpdate(ID int, Email string, PasswordDigest string) (*models.User, error) {
+	findUser := models.User{}
+	err := ur.db.Where("id = ?", ID).First(&findUser).Error
+	if err != nil {
+		return nil, err
+	}
+	updateUser := models.User{}
+	updateUser.Email = Email
+	updateUser.PasswordDigest = PasswordDigest
+	err = ur.db.Model(&findUser).Update(&updateUser).Error
+	if err != nil {
+		return nil, err
+	}
+	err = ur.db.Where("id = ?", ID).First(&findUser).Error
+	if err != nil {
+		return nil, err
+	}
+	return &findUser, nil
 }
 
 // func (ur *userRepositoryImpl) UserPut(ID int) (*models.User, error) {
