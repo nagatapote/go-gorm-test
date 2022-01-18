@@ -10,7 +10,7 @@ type UserUseCase interface {
 	UserGetUseCase() (resp interface{}, statuscode int, err error)
 	UserPostUseCase(Email string, PasswordDigest string) (resp interface{}, statuscode int, err error)
 	UserUpdateUseCase(ID int, Email string, PasswordDigest string) (resp interface{}, statuscode int, err error)
-	// UserDeleteUseCase(ID int) (resp interface{}, statuscode int, err error)
+	UserDeleteUseCase(ID int) (resp interface{}, statuscode int, err error)
 }
 
 type userUseCaceImpl struct {
@@ -45,10 +45,10 @@ func (uu userUseCaceImpl) UserUpdateUseCase(ID int, Email string, PasswordDigest
 	return resp, http.StatusOK, nil
 }
 
-// func (uu userUseCaceImpl) UserDeleteUseCase(ID int) (resp interface{}, statuscode int, err error) {
-// 	resp, err = uu.Ur.UserDelete(ID)
-// 	if err != nil {
-// 		return nil, http.StatusInternalServerError, util.ErrorServerError
-// 	}
-// 	return resp, http.StatusOK, nil
-// }
+func (uu userUseCaceImpl) UserDeleteUseCase(ID int) (resp interface{}, statuscode int, err error) {
+	resp, err = uu.Ur.UserDelete(ID)
+	if err != nil {
+		return nil, http.StatusInternalServerError, util.ErrorServerError
+	}
+	return resp, http.StatusOK, nil
+}

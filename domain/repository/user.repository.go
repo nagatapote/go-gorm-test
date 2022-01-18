@@ -10,7 +10,7 @@ type UserRepository interface {
 	UserGet() (*[]models.User, error)
 	UserPost(Email string, PasswordDigest string) (*models.User, error)
 	UserUpdate(ID int, Email string, PasswordDigest string) (*models.User, error)
-	// UserDelete(ID int) (*models.User, error)
+	UserDelete(ID int) (*models.User, error)
 }
 
 type userRepositoryImpl struct {
@@ -61,17 +61,16 @@ func (ur *userRepositoryImpl) UserUpdate(ID int, Email string, PasswordDigest st
 	return &findUser, nil
 }
 
-// func (ur *userRepositoryImpl) UserPut(ID int) (*models.User, error) {
-// 	user := models.User{ID: 1}
-// 	user.Email = null.StringFrom("update@example.com")
-// 	user.Update(context.Background(), db.DB, boil.Infer())
+func (ur *userRepositoryImpl) UserDelete(ID int) (*models.User, error) {
+	findUser := models.User{}
+	err := ur.db.Where("id = ?", ID).First(&findUser).Error
+	if err != nil {
+		return nil, err
+	}
+	err = ur.db.Delete(&findUser).Error
+	if err != nil {
+		return nil, err
+	}
 
-// 	return &user, nil
-// }
-
-// func (ur *userRepositoryImpl) UserDelete(ID int) (*models.User, error) {
-// 	user := models.User{ID: ID}
-// 	user.Delete(context.Background(), db.DB)
-
-// 	return &user, nil
-// }
+	return &findUser, nil
+}

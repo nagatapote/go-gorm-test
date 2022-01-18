@@ -23,5 +23,5 @@ func (ur userRouter) UserRouting(e *echo.Echo) {
 	r.GET("/all", ur.Uc.UserGet)
 	r.POST("/create", ur.Uc.UserPost)
 	r.PUT("/update/:id", ur.Uc.UserUpdate)
-	// r.DELETE("/delete", ur.Uc.UserDelete)
+	r.DELETE("/delete/:id", ur.Uc.UserDelete)
 }

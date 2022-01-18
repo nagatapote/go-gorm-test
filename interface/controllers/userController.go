@@ -14,7 +14,7 @@ type UserController interface {
 	UserGet(c echo.Context) (err error)
 	UserPost(c echo.Context) (err error)
 	UserUpdate(c echo.Context) (err error)
-	// UserDelete(c echo.Context) (err error)
+	UserDelete(c echo.Context) (err error)
 }
 
 type userController struct {
@@ -35,9 +35,6 @@ type (
 		Email          string `json:"email" validate:"required,email"`
 		PasswordDigest string `json:"password" validate:"required,gte=8,password"`
 	}
-	// userdelete struct {
-	// 	ID int
-	// }
 )
 
 func (uc userController) UserGet(c echo.Context) (err error) {
@@ -80,7 +77,7 @@ func (uc userController) UserUpdate(c echo.Context) (err error) {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, util.ErrorNoParameter)
 	}
-	f, _ := strconv.Atoi(id)
+	f, err := strconv.Atoi(id)
 	post, statuscode, err := uc.Cuu.UserUpdateUseCase(f, uu.Email, uu.PasswordDigest)
 	if err != nil {
 		message := models.Message{
@@ -91,14 +88,15 @@ func (uc userController) UserUpdate(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, post)
 }
 
-// func (uc userController) UserDelete(c echo.Context) (err error) {
-// 	ud := new(userdelete)
-// 	post, statuscode, err := uc.Cuu.UserDeleteUseCase(ud.ID)
-// 	if err != nil {
-// 		message := models.Message{
-// 			Message: err.Error(),
-// 		}
-// 		return echo.NewHTTPError(statuscode, message)
-// 	}
-// 	return c.JSON(http.StatusOK, post)
-// }
+func (uc userController) UserDelete(c echo.Context) (err error) {
+	id := c.Param("id")
+	f, err := strconv.Atoi(id)
+	post, statuscode, err := uc.Cuu.UserDeleteUseCase(f)
+	if err != nil {
+		message := models.Message{
+			Message: err.Error(),
+		}
+		return echo.NewHTTPError(statuscode, message)
+	}
+	return c.JSON(http.StatusOK, post)
+}
