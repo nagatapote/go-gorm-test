@@ -7,7 +7,8 @@ import (
 )
 
 type UserRepository interface {
-	UserFindOne(ID string) (*models.User, error)
+	UserFindEmail(Email string) (*models.User, error)
+	UserFindID(ID string) (*models.User, error)
 	UserFindAll() (*[]models.User, error)
 	UserCreate(Email string, PasswordDigest string) (*models.User, error)
 	UserUpdate(ID int, Email string, PasswordDigest string) (*models.User, error)
@@ -22,7 +23,15 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepositoryImpl{db}
 }
 
-func (ur *userRepositoryImpl) UserFindOne(ID string) (*models.User, error) {
+func (ur *userRepositoryImpl) UserFindEmail(Email string) (*models.User, error) {
+	findUser := models.User{}
+	err := ur.db.Where("Email = ?", Email).First(&findUser).Error
+	if err != nil {
+		return nil, err
+	}
+	return &findUser, nil
+}
+func (ur *userRepositoryImpl) UserFindID(ID string) (*models.User, error) {
 	findUser := models.User{}
 	err := ur.db.Where("id = ?", ID).First(&findUser).Error
 	if err != nil {
