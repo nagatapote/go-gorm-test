@@ -7,8 +7,9 @@ import (
 )
 
 type UserRepository interface {
-	UserGet() (*[]models.User, error)
-	UserPost(Email string, PasswordDigest string) (*models.User, error)
+	UserFindOne(ID string) (*models.User, error)
+	UserFindAll() (*[]models.User, error)
+	UserCreate(Email string, PasswordDigest string) (*models.User, error)
 	UserUpdate(ID int, Email string, PasswordDigest string) (*models.User, error)
 	UserDelete(ID int) (*models.User, error)
 }
@@ -21,7 +22,16 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepositoryImpl{db}
 }
 
-func (ur *userRepositoryImpl) UserGet() (*[]models.User, error) {
+func (ur *userRepositoryImpl) UserFindOne(ID string) (*models.User, error) {
+	findUser := models.User{}
+	err := ur.db.Where("id = ?", ID).First(&findUser).Error
+	if err != nil {
+		return nil, err
+	}
+	return &findUser, nil
+}
+
+func (ur *userRepositoryImpl) UserFindAll() (*[]models.User, error) {
 	findUsers := []models.User{}
 	err := ur.db.Find(&findUsers).Error
 	if err != nil {
@@ -30,7 +40,7 @@ func (ur *userRepositoryImpl) UserGet() (*[]models.User, error) {
 	return &findUsers, nil
 }
 
-func (ur *userRepositoryImpl) UserPost(Email string, PasswordDigest string) (*models.User, error) {
+func (ur *userRepositoryImpl) UserCreate(Email string, PasswordDigest string) (*models.User, error) {
 	insertUser := models.User{}
 	insertUser.Email = Email
 	insertUser.PasswordDigest = PasswordDigest
