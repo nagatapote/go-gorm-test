@@ -16,3 +16,14 @@ DB：postgresQL(docker)
 
 ## docker db 確認方法
 `$ docker exec -it sample_database psql -U root`
+
+## request body
+application/json
+
+## login
+
+email: admin@admin.com
+password: Admin1234
+
+## request headers
+Authorization: Bearer ${token}
