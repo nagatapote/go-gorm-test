@@ -42,8 +42,10 @@ func main() {
 	e.Validator = &util.CustomValidator{Validator: validator.New()}
 
 	// DI
+	passwordUtil := util.NewPasswordUtil()
+	authUtil := util.NewAuthUtil()
 	userRepository := repository.NewUserRepository(db.DB)
-	userUseCase := usecase.NewUserUseCase(userRepository)
+	userUseCase := usecase.NewUserUseCase(userRepository, passwordUtil, authUtil)
 	userController := controllers.NewUserController(userUseCase)
 	userRouter := route.NewUserRouter(userController)
 	indexRouter := route.NewIndexRouter(userRouter)

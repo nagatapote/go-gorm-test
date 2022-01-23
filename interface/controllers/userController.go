@@ -11,8 +11,9 @@ import (
 )
 
 type UserController interface {
+	UserLogin(c echo.Context) (err error)
 	UserGet(c echo.Context) (err error)
-	UserPost(c echo.Context) (err error)
+	UserCreate(c echo.Context) (err error)
 	UserUpdate(c echo.Context) (err error)
 	UserDelete(c echo.Context) (err error)
 }
@@ -26,16 +27,36 @@ func NewUserController(cuu usecase.UserUseCase) UserController {
 }
 
 type (
+	userlogin struct {
+		Email    string `json:"email" validate:"required,email"`
+		Password string `json:"password" validate:"required,gte=8,password"`
+	}
 	userpost struct {
-		Email          string `json:"email" validate:"required,email"`
-		PasswordDigest string `json:"password" validate:"required,gte=8,password"`
+		Email    string `json:"email" validate:"required,email"`
+		Password string `json:"password" validate:"required,gte=8,password"`
 	}
 
 	userupdate struct {
-		Email          string `json:"email" validate:"required,email"`
-		PasswordDigest string `json:"password" validate:"required,gte=8,password"`
+		Email    string `json:"email" validate:"required,email"`
+		Password string `json:"password" validate:"required,gte=8,password"`
 	}
 )
+
+func (uc userController) UserLogin(c echo.Context) (err error) {
+	ul := new(userlogin)
+	err = util.BindValidate(c, ul)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, util.ErrorNoParameter)
+	}
+	post, statuscode, err := uc.Cuu.UserLoginUseCase(ul.Email, ul.Password)
+	if err != nil {
+		message := models.Message{
+			Message: err.Error(),
+		}
+		return echo.NewHTTPError(statuscode, message)
+	}
+	return c.JSON(http.StatusOK, post)
+}
 
 func (uc userController) UserGet(c echo.Context) (err error) {
 	post, statuscode, err := uc.Cuu.UserGetUseCase()
@@ -48,10 +69,10 @@ func (uc userController) UserGet(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, post)
 }
 
-func (uc userController) UserPost(c echo.Context) (err error) {
+func (uc userController) UserCreate(c echo.Context) (err error) {
 	// up := &userpost{
 	// 	Email:          c.FormValue("email"),
-	// 	PasswordDigest: c.FormValue("password"),
+	// 	Password: c.FormValue("password"),
 	// }
 
 	//NOTE: body content type application/jsonであれば、post dataをこれで受け取れる。
@@ -60,7 +81,7 @@ func (uc userController) UserPost(c echo.Context) (err error) {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, util.ErrorNoParameter)
 	}
-	post, statuscode, err := uc.Cuu.UserPostUseCase(up.Email, up.PasswordDigest)
+	post, statuscode, err := uc.Cuu.UserCreateUseCase(up.Email, up.Password)
 	if err != nil {
 		message := models.Message{
 			Message: err.Error(),
@@ -78,7 +99,7 @@ func (uc userController) UserUpdate(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusBadRequest, util.ErrorNoParameter)
 	}
 	f, err := strconv.Atoi(id)
-	post, statuscode, err := uc.Cuu.UserUpdateUseCase(f, uu.Email, uu.PasswordDigest)
+	post, statuscode, err := uc.Cuu.UserUpdateUseCase(f, uu.Email, uu.Password)
 	if err != nil {
 		message := models.Message{
 			Message: err.Error(),

@@ -10,8 +10,8 @@ type UserRepository interface {
 	UserFindEmail(Email string) (*models.User, error)
 	UserFindID(ID string) (*models.User, error)
 	UserFindAll() (*[]models.User, error)
-	UserCreate(Email string, PasswordDigest string) (*models.User, error)
-	UserUpdate(ID int, Email string, PasswordDigest string) (*models.User, error)
+	UserCreate(Email string, Password string) (*models.User, error)
+	UserUpdate(ID int, Email string, Password string) (*models.User, error)
 	UserDelete(ID int) (*models.User, error)
 }
 
@@ -49,10 +49,10 @@ func (ur *userRepositoryImpl) UserFindAll() (*[]models.User, error) {
 	return &findUsers, nil
 }
 
-func (ur *userRepositoryImpl) UserCreate(Email string, PasswordDigest string) (*models.User, error) {
+func (ur *userRepositoryImpl) UserCreate(Email string, Password string) (*models.User, error) {
 	insertUser := models.User{}
 	insertUser.Email = Email
-	insertUser.PasswordDigest = PasswordDigest
+	insertUser.CryptedPassword = Password
 	err := ur.db.Create(&insertUser).Error
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (ur *userRepositoryImpl) UserCreate(Email string, PasswordDigest string) (*
 	return &insertUser, nil
 }
 
-func (ur *userRepositoryImpl) UserUpdate(ID int, Email string, PasswordDigest string) (*models.User, error) {
+func (ur *userRepositoryImpl) UserUpdate(ID int, Email string, Password string) (*models.User, error) {
 	findUser := models.User{}
 	err := ur.db.Where("id = ?", ID).First(&findUser).Error
 	if err != nil {
@@ -68,7 +68,7 @@ func (ur *userRepositoryImpl) UserUpdate(ID int, Email string, PasswordDigest st
 	}
 	updateUser := models.User{}
 	updateUser.Email = Email
-	updateUser.PasswordDigest = PasswordDigest
+	updateUser.CryptedPassword = Password
 	err = ur.db.Model(&findUser).Update(&updateUser).Error
 	if err != nil {
 		return nil, err

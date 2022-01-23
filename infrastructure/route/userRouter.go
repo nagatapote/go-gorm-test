@@ -8,6 +8,8 @@ import (
 
 type UserRouter interface {
 	UserRouting(e *echo.Echo)
+	userAuthRouting(e *echo.Echo)
+	userCertificationRouting(e *echo.Echo)
 }
 
 type userRouter struct {
@@ -19,9 +21,19 @@ func NewUserRouter(uc controllers.UserController) UserRouter {
 }
 
 func (ur userRouter) UserRouting(e *echo.Echo) {
+	ur.userAuthRouting(e)
+	ur.userCertificationRouting(e)
+}
+
+func (ur userRouter) userAuthRouting(e *echo.Echo) {
+	r := e.Group("/user")
+	r.POST("/login", ur.Uc.UserLogin)
+}
+
+func (ur userRouter) userCertificationRouting(e *echo.Echo) {
 	r := e.Group("/user")
 	r.GET("/all", ur.Uc.UserGet)
-	r.POST("/create", ur.Uc.UserPost)
+	r.POST("/create", ur.Uc.UserCreate)
 	r.PUT("/update/:id", ur.Uc.UserUpdate)
 	r.DELETE("/delete/:id", ur.Uc.UserDelete)
 }
