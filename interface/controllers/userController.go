@@ -14,6 +14,7 @@ type UserController interface {
 	UserLogin(c echo.Context) (err error)
 	UserGet(c echo.Context) (err error)
 	UserCreate(c echo.Context) (err error)
+	UserUpload(c echo.Context) (err error)
 	UserUpdate(c echo.Context) (err error)
 	UserDelete(c echo.Context) (err error)
 }
@@ -35,7 +36,6 @@ type (
 		Email    string `json:"email" validate:"required,email"`
 		Password string `json:"password" validate:"required,gte=8,password"`
 	}
-
 	userupdate struct {
 		Email    string `json:"email" validate:"required,email"`
 		Password string `json:"password" validate:"required,gte=8,password"`
@@ -91,6 +91,21 @@ func (uc userController) UserCreate(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, post)
 }
 
+func (uc userController) UserUpload(c echo.Context) (err error) {
+	file, err := c.FormFile("file")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, util.ErrorNoParameter)
+	}
+	post, statuscode, err := uc.Cuu.UserUploadUseCase(file)
+	if err != nil {
+		message := models.Message{
+			Message: err.Error(),
+		}
+		return echo.NewHTTPError(statuscode, message)
+	}
+	return c.JSON(http.StatusOK, post)
+}
+
 func (uc userController) UserUpdate(c echo.Context) (err error) {
 	id := c.Param("id")
 	uu := new(userupdate)
@@ -99,6 +114,9 @@ func (uc userController) UserUpdate(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusBadRequest, util.ErrorNoParameter)
 	}
 	f, err := strconv.Atoi(id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, util.ErrorServerError)
+	}
 	post, statuscode, err := uc.Cuu.UserUpdateUseCase(f, uu.Email, uu.Password)
 	if err != nil {
 		message := models.Message{
@@ -112,6 +130,9 @@ func (uc userController) UserUpdate(c echo.Context) (err error) {
 func (uc userController) UserDelete(c echo.Context) (err error) {
 	id := c.Param("id")
 	f, err := strconv.Atoi(id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, util.ErrorServerError)
+	}
 	post, statuscode, err := uc.Cuu.UserDeleteUseCase(f)
 	if err != nil {
 		message := models.Message{
