@@ -62,7 +62,11 @@ func (uu userUseCaceImpl) UserGetUseCase() (resp interface{}, statuscode int, er
 }
 
 func (uu userUseCaceImpl) UserCreateUseCase(Email string, Password string) (resp interface{}, statuscode int, err error) {
-	resp, err = uu.Ur.UserCreate(Email, Password)
+	encryptPassword, err := uu.Pu.PasswordGenerate(Password)
+	if err != nil {
+		return nil, http.StatusInternalServerError, util.ErrorServerError
+	}
+	resp, err = uu.Ur.UserCreate(Email, string(encryptPassword))
 	if err != nil {
 		return nil, http.StatusInternalServerError, util.ErrorServerError
 	}
@@ -70,7 +74,11 @@ func (uu userUseCaceImpl) UserCreateUseCase(Email string, Password string) (resp
 }
 
 func (uu userUseCaceImpl) UserUpdateUseCase(ID int, Email string, Password string) (resp interface{}, statuscode int, err error) {
-	resp, err = uu.Ur.UserUpdate(ID, Email, Password)
+	encryptPassword, err := uu.Pu.PasswordGenerate(Password)
+	if err != nil {
+		return nil, http.StatusInternalServerError, util.ErrorServerError
+	}
+	resp, err = uu.Ur.UserUpdate(ID, Email, string(encryptPassword))
 	if err != nil {
 		return nil, http.StatusInternalServerError, util.ErrorServerError
 	}

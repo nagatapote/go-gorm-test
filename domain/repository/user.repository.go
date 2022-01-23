@@ -49,10 +49,10 @@ func (ur *userRepositoryImpl) UserFindAll() (*[]models.User, error) {
 	return &findUsers, nil
 }
 
-func (ur *userRepositoryImpl) UserCreate(Email string, Password string) (*models.User, error) {
+func (ur *userRepositoryImpl) UserCreate(Email string, userEncryptPassword string) (*models.User, error) {
 	insertUser := models.User{}
 	insertUser.Email = Email
-	insertUser.CryptedPassword = Password
+	insertUser.CryptedPassword = userEncryptPassword
 	err := ur.db.Create(&insertUser).Error
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (ur *userRepositoryImpl) UserCreate(Email string, Password string) (*models
 	return &insertUser, nil
 }
 
-func (ur *userRepositoryImpl) UserUpdate(ID int, Email string, Password string) (*models.User, error) {
+func (ur *userRepositoryImpl) UserUpdate(ID int, Email string, userEncryptPassword string) (*models.User, error) {
 	findUser := models.User{}
 	err := ur.db.Where("id = ?", ID).First(&findUser).Error
 	if err != nil {
@@ -68,7 +68,7 @@ func (ur *userRepositoryImpl) UserUpdate(ID int, Email string, Password string) 
 	}
 	updateUser := models.User{}
 	updateUser.Email = Email
-	updateUser.CryptedPassword = Password
+	updateUser.CryptedPassword = userEncryptPassword
 	err = ur.db.Model(&findUser).Update(&updateUser).Error
 	if err != nil {
 		return nil, err
