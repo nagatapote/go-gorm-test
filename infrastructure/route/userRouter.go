@@ -2,8 +2,10 @@ package route
 
 import (
 	"go-gorm-test/interface/controllers"
+	"os"
 
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 type UserRouter interface {
@@ -32,6 +34,7 @@ func (ur userRouter) userAuthRouting(e *echo.Echo) {
 
 func (ur userRouter) userCertificationRouting(e *echo.Echo) {
 	r := e.Group("/user")
+	r.Use(middleware.JWT([]byte(os.Getenv("SIGNINGKEY"))))
 	r.GET("/all", ur.Uc.UserGet)
 	r.POST("/create", ur.Uc.UserCreate)
 	r.PUT("/update/:id", ur.Uc.UserUpdate)
