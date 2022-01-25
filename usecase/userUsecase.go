@@ -115,7 +115,7 @@ func (uu userUseCaceImpl) UserUploadUseCase(file *multipart.FileHeader) (resp in
 	if err != nil {
 		return nil, http.StatusInternalServerError, util.ErrorServerError
 	}
-	resp = string("complite")
+	resp = string("https://" + os.Getenv("BUCKET_NAME") + ".s3.ap-northeast-1.amazonaws.com/" + filename)
 	return resp, http.StatusOK, nil
 }
 
