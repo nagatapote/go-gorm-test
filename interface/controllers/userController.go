@@ -15,6 +15,7 @@ type UserController interface {
 	UserGet(c echo.Context) (err error)
 	UserCreate(c echo.Context) (err error)
 	UserUpload(c echo.Context) (err error)
+	UserDownload(c echo.Context) (err error)
 	UserUpdate(c echo.Context) (err error)
 	UserDelete(c echo.Context) (err error)
 }
@@ -35,6 +36,9 @@ type (
 	userpost struct {
 		Email    string `json:"email" validate:"required,email"`
 		Password string `json:"password" validate:"required,gte=8,password"`
+	}
+	userdownload struct {
+		Filename string `json:"filename" validate:"required"`
 	}
 	userupdate struct {
 		Email    string `json:"email" validate:"required,email"`
@@ -97,6 +101,22 @@ func (uc userController) UserUpload(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusBadRequest, util.ErrorNoParameter)
 	}
 	post, statuscode, err := uc.Cuu.UserUploadUseCase(file)
+	if err != nil {
+		message := models.Message{
+			Message: err.Error(),
+		}
+		return echo.NewHTTPError(statuscode, message)
+	}
+	return c.JSON(http.StatusOK, post)
+}
+
+func (uc userController) UserDownload(c echo.Context) (err error) {
+	ud := new(userdownload)
+	err = util.BindValidate(c, ud)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, util.ErrorNoParameter)
+	}
+	post, statuscode, err := uc.Cuu.UserDownloadUseCase(ud.Filename)
 	if err != nil {
 		message := models.Message{
 			Message: err.Error(),

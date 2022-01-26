@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"bytes"
 	"fmt"
 	"go-gorm-test/domain/repository"
 	"go-gorm-test/util"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
@@ -20,6 +22,7 @@ type UserUseCase interface {
 	UserGetUseCase() (resp interface{}, statuscode int, err error)
 	UserCreateUseCase(Email string, Password string) (resp interface{}, statuscode int, err error)
 	UserUploadUseCase(file *multipart.FileHeader) (resp interface{}, statuscode int, err error)
+	UserDownloadUseCase(Filename string) (resp interface{}, statuscode int, err error)
 	UserUpdateUseCase(ID int, Email string, Password string) (resp interface{}, statuscode int, err error)
 	UserDeleteUseCase(ID int) (resp interface{}, statuscode int, err error)
 }
@@ -90,8 +93,8 @@ func (uu userUseCaceImpl) UserUploadUseCase(file *multipart.FileHeader) (resp in
 	}
 	defer filedata.Close()
 	sess, err := session.NewSessionWithOptions(session.Options{
-		Config:  aws.Config{Region: aws.String("ap-northeast-1")},
-		Profile: "default",
+		Config: aws.Config{Region: aws.String(os.Getenv("REGION"))},
+		// Profile: "default", NOTE: 書かなくても"default"になる。
 	})
 	if err != nil {
 		return nil, http.StatusInternalServerError, util.ErrorServerError
@@ -115,7 +118,29 @@ func (uu userUseCaceImpl) UserUploadUseCase(file *multipart.FileHeader) (resp in
 	if err != nil {
 		return nil, http.StatusInternalServerError, util.ErrorServerError
 	}
-	resp = string("https://" + os.Getenv("BUCKET_NAME") + ".s3.ap-northeast-1.amazonaws.com/" + filename)
+	resp = string("https://" + os.Getenv("BUCKET_NAME") + ".s3." + os.Getenv("REGION") + ".amazonaws.com/" + filename)
+	return resp, http.StatusOK, nil
+}
+
+func (uu userUseCaceImpl) UserDownloadUseCase(Finename string) (resp interface{}, statuscode int, err error) {
+	sess, err := session.NewSessionWithOptions(session.Options{
+		Config: aws.Config{Region: aws.String(os.Getenv("REGION"))},
+		// Profile: "default", NOTE: 書かなくても"default"になる。
+	})
+	if err != nil {
+		return nil, http.StatusInternalServerError, util.ErrorServerError
+	}
+	d := s3manager.NewDownloader(sess)
+	buf := aws.NewWriteAtBuffer([]byte{})
+	_, err = d.Download(buf, &s3.GetObjectInput{
+		Bucket: aws.String(os.Getenv("BUCKET_NAME")),
+		Key:    aws.String(Finename),
+	})
+	if err != nil {
+		return nil, http.StatusInternalServerError, util.ErrorServerError
+	}
+	// TODO: ブラウザでダウンロードできるようにする。
+	resp = bytes.NewBuffer(buf.Bytes()).String()
 	return resp, http.StatusOK, nil
 }
 
