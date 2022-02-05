@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"bytes"
 	"fmt"
 	"go-gorm-test/domain/repository"
 	"go-gorm-test/util"
@@ -22,7 +21,7 @@ type UserUseCase interface {
 	UserGetUseCase() (resp interface{}, statuscode int, err error)
 	UserCreateUseCase(Email string, Password string) (resp interface{}, statuscode int, err error)
 	UserUploadUseCase(file *multipart.FileHeader) (resp interface{}, statuscode int, err error)
-	UserDownloadUseCase(Filename string) (resp interface{}, statuscode int, err error)
+	UserDownloadUseCase(Filename string) (resp []byte, statuscode int, err error)
 	UserUpdateUseCase(ID int, Email string, Password string) (resp interface{}, statuscode int, err error)
 	UserDeleteUseCase(ID int) (resp interface{}, statuscode int, err error)
 }
@@ -122,7 +121,7 @@ func (uu userUseCaceImpl) UserUploadUseCase(file *multipart.FileHeader) (resp in
 	return resp, http.StatusOK, nil
 }
 
-func (uu userUseCaceImpl) UserDownloadUseCase(Finename string) (resp interface{}, statuscode int, err error) {
+func (uu userUseCaceImpl) UserDownloadUseCase(Finename string) (resp []byte, statuscode int, err error) {
 	sess, err := session.NewSessionWithOptions(session.Options{
 		Config: aws.Config{Region: aws.String(os.Getenv("REGION"))},
 		// Profile: "default", NOTE: 書かなくても"default"になる。
@@ -139,8 +138,8 @@ func (uu userUseCaceImpl) UserDownloadUseCase(Finename string) (resp interface{}
 	if err != nil {
 		return nil, http.StatusInternalServerError, util.ErrorServerError
 	}
-	// TODO: ブラウザでダウンロードできるようにする。
-	resp = bytes.NewBuffer(buf.Bytes()).String()
+
+	resp = buf.Bytes()
 	return resp, http.StatusOK, nil
 }
 

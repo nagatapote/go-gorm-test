@@ -123,7 +123,7 @@ func (uc userController) UserDownload(c echo.Context) (err error) {
 		}
 		return echo.NewHTTPError(statuscode, message)
 	}
-	return c.JSON(http.StatusOK, post)
+	return c.Blob(http.StatusOK, "image/jpeg", post)
 }
 
 func (uc userController) UserUpdate(c echo.Context) (err error) {
