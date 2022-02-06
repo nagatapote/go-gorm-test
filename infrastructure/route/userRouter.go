@@ -35,7 +35,7 @@ func (ur userRouter) userAuthRouting(e *echo.Echo) {
 func (ur userRouter) userCertificationRouting(e *echo.Echo) {
 	r := e.Group("/users")
 	r.Use(middleware.JWT([]byte(os.Getenv("SIGNINGKEY"))))
-	r.GET("/all", ur.Uc.UserGet)
+	r.GET("/", ur.Uc.UserGet)
 	r.POST("/create", ur.Uc.UserCreate)
 	r.PUT("/update/:id", ur.Uc.UserUpdate)
 	r.DELETE("/delete/:id", ur.Uc.UserDelete)
