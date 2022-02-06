@@ -17,6 +17,7 @@ import (
 )
 
 type FileUseCase interface {
+	FileGetAllUseCase() (resp interface{}, statuscode int, err error)
 	FileUploadUseCase(File *multipart.FileHeader) (resp interface{}, statuscode int, err error)
 	FileDownloadUseCase(Filename string) (resp []byte, statuscode int, err error)
 }
@@ -27,6 +28,14 @@ type fileUseCaceImpl struct {
 
 func NewFileUseCase(fr repository.FileRepository) FileUseCase {
 	return fileUseCaceImpl{fr}
+}
+
+func (fu fileUseCaceImpl) FileGetAllUseCase() (resp interface{}, statuscode int, err error) {
+	resp, err = fu.Fr.FileGetAll()
+	if err != nil {
+		return nil, http.StatusInternalServerError, util.ErrorServerError
+	}
+	return resp, http.StatusOK, nil
 }
 
 func (fu fileUseCaceImpl) FileUploadUseCase(File *multipart.FileHeader) (resp interface{}, statuscode int, err error) {

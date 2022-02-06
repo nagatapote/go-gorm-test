@@ -10,6 +10,7 @@ import (
 )
 
 type FileController interface {
+	FileGetAll(c echo.Context) (err error)
 	FileUpload(c echo.Context) (err error)
 	FileDownload(c echo.Context) (err error)
 }
@@ -27,6 +28,17 @@ type (
 		Filename string `json:"filename" validate:"required"`
 	}
 )
+
+func (fc fileController) FileGetAll(c echo.Context) (err error) {
+	post, statuscode, err := fc.Cfu.FileGetAllUseCase()
+	if err != nil {
+		message := models.Message{
+			Message: err.Error(),
+		}
+		return echo.NewHTTPError(statuscode, message)
+	}
+	return c.JSON(http.StatusOK, post)
+}
 
 func (fc fileController) FileUpload(c echo.Context) (err error) {
 	file, err := c.FormFile("file")
