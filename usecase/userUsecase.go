@@ -8,7 +8,7 @@ import (
 
 type UserUseCase interface {
 	UserLoginUseCase(Email string, Password string) (resp interface{}, statuscode int, err error)
-	UserGetUseCase() (resp interface{}, statuscode int, err error)
+	UserGetAllUseCase() (resp interface{}, statuscode int, err error)
 	UserCreateUseCase(Email string, Password string) (resp interface{}, statuscode int, err error)
 	UserUpdateUseCase(ID int, Email string, Password string) (resp interface{}, statuscode int, err error)
 	UserDeleteUseCase(ID int) (resp interface{}, statuscode int, err error)
@@ -53,8 +53,8 @@ func (uu userUseCaceImpl) UserLoginUseCase(Email string, Password string) (resp 
 
 }
 
-func (uu userUseCaceImpl) UserGetUseCase() (resp interface{}, statuscode int, err error) {
-	resp, err = uu.Ur.UserFindAll()
+func (uu userUseCaceImpl) UserGetAllUseCase() (resp interface{}, statuscode int, err error) {
+	resp, err = uu.Ur.UserGetAll()
 	if err != nil {
 		return nil, http.StatusInternalServerError, util.ErrorServerError
 	}

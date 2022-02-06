@@ -12,7 +12,7 @@ import (
 
 type UserController interface {
 	UserLogin(c echo.Context) (err error)
-	UserGet(c echo.Context) (err error)
+	UserGetAll(c echo.Context) (err error)
 	UserCreate(c echo.Context) (err error)
 	UserUpdate(c echo.Context) (err error)
 	UserDelete(c echo.Context) (err error)
@@ -57,8 +57,8 @@ func (uc userController) UserLogin(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, post)
 }
 
-func (uc userController) UserGet(c echo.Context) (err error) {
-	post, statuscode, err := uc.Cuu.UserGetUseCase()
+func (uc userController) UserGetAll(c echo.Context) (err error) {
+	post, statuscode, err := uc.Cuu.UserGetAllUseCase()
 	if err != nil {
 		message := models.Message{
 			Message: err.Error(),

@@ -9,7 +9,7 @@ import (
 type UserRepository interface {
 	UserFindEmail(Email string) (*models.User, error)
 	UserFindID(ID string) (*models.User, error)
-	UserFindAll() (*[]models.User, error)
+	UserGetAll() (*[]models.User, error)
 	UserCreate(Email string, Password string) (*models.User, error)
 	UserUpdate(ID int, Email string, Password string) (*models.User, error)
 	UserDelete(ID int) (*models.User, error)
@@ -40,7 +40,7 @@ func (ur *userRepositoryImpl) UserFindID(ID string) (*models.User, error) {
 	return &findUser, nil
 }
 
-func (ur *userRepositoryImpl) UserFindAll() (*[]models.User, error) {
+func (ur *userRepositoryImpl) UserGetAll() (*[]models.User, error) {
 	findUsers := []models.User{}
 	err := ur.db.Find(&findUsers).Error
 	if err != nil {
