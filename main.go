@@ -45,10 +45,14 @@ func main() {
 	passwordUtil := util.NewPasswordUtil()
 	authUtil := util.NewAuthUtil()
 	userRepository := repository.NewUserRepository(db.DB)
+	fileRepository := repository.NewFileRepository(db.DB)
 	userUseCase := usecase.NewUserUseCase(userRepository, passwordUtil, authUtil)
+	fileUseCase := usecase.NewFileUseCase(fileRepository)
 	userController := controllers.NewUserController(userUseCase)
+	fileController := controllers.NewFileController(fileUseCase)
 	userRouter := route.NewUserRouter(userController)
-	indexRouter := route.NewIndexRouter(userRouter)
+	fileRouter := route.NewFileRouter(fileController)
+	indexRouter := route.NewIndexRouter(userRouter, fileRouter)
 
 	indexRouter.Routing(e)
 

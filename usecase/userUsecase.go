@@ -1,27 +1,15 @@
 package usecase
 
 import (
-	"fmt"
 	"go-gorm-test/domain/repository"
 	"go-gorm-test/util"
-	"mime/multipart"
 	"net/http"
-	"os"
-	"strings"
-	"time"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
 type UserUseCase interface {
 	UserLoginUseCase(Email string, Password string) (resp interface{}, statuscode int, err error)
 	UserGetUseCase() (resp interface{}, statuscode int, err error)
 	UserCreateUseCase(Email string, Password string) (resp interface{}, statuscode int, err error)
-	UserUploadUseCase(file *multipart.FileHeader) (resp interface{}, statuscode int, err error)
-	UserDownloadUseCase(Filename string) (resp []byte, statuscode int, err error)
 	UserUpdateUseCase(ID int, Email string, Password string) (resp interface{}, statuscode int, err error)
 	UserDeleteUseCase(ID int) (resp interface{}, statuscode int, err error)
 }
@@ -82,64 +70,6 @@ func (uu userUseCaceImpl) UserCreateUseCase(Email string, Password string) (resp
 	if err != nil {
 		return nil, http.StatusInternalServerError, util.ErrorServerError
 	}
-	return resp, http.StatusOK, nil
-}
-
-func (uu userUseCaceImpl) UserUploadUseCase(file *multipart.FileHeader) (resp interface{}, statuscode int, err error) {
-	filedata, err := file.Open()
-	if err != nil {
-		return nil, http.StatusInternalServerError, util.ErrorServerError
-	}
-	defer filedata.Close()
-	sess, err := session.NewSessionWithOptions(session.Options{
-		Config: aws.Config{Region: aws.String(os.Getenv("REGION"))},
-		// Profile: "default", NOTE: 書かなくても"default"になる。
-	})
-	if err != nil {
-		return nil, http.StatusInternalServerError, util.ErrorServerError
-	}
-	fileModel := strings.Split(file.Filename, ".")
-	// fileName := fileModel[0]
-	extension := fileModel[1]
-	filename := fmt.Sprintf("uploaded_%d.%s", time.Now().UnixNano(), extension)
-	if err != nil {
-		return nil, http.StatusInternalServerError, util.ErrorServerError
-	}
-	if err != nil {
-		return nil, http.StatusInternalServerError, util.ErrorServerError
-	}
-	u := s3manager.NewUploader(sess)
-	_, err = u.Upload(&s3manager.UploadInput{
-		Bucket: aws.String(os.Getenv("BUCKET_NAME")),
-		Body:   filedata,
-		Key:    aws.String(filename),
-	})
-	if err != nil {
-		return nil, http.StatusInternalServerError, util.ErrorServerError
-	}
-	resp = string("https://" + os.Getenv("BUCKET_NAME") + ".s3." + os.Getenv("REGION") + ".amazonaws.com/" + filename)
-	return resp, http.StatusOK, nil
-}
-
-func (uu userUseCaceImpl) UserDownloadUseCase(Finename string) (resp []byte, statuscode int, err error) {
-	sess, err := session.NewSessionWithOptions(session.Options{
-		Config: aws.Config{Region: aws.String(os.Getenv("REGION"))},
-		// Profile: "default", NOTE: 書かなくても"default"になる。
-	})
-	if err != nil {
-		return nil, http.StatusInternalServerError, util.ErrorServerError
-	}
-	d := s3manager.NewDownloader(sess)
-	buf := aws.NewWriteAtBuffer([]byte{})
-	_, err = d.Download(buf, &s3.GetObjectInput{
-		Bucket: aws.String(os.Getenv("BUCKET_NAME")),
-		Key:    aws.String(Finename),
-	})
-	if err != nil {
-		return nil, http.StatusInternalServerError, util.ErrorServerError
-	}
-
-	resp = buf.Bytes()
 	return resp, http.StatusOK, nil
 }
 

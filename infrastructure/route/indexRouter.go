@@ -12,10 +12,11 @@ type IndexRouter interface {
 
 type indexRouter struct {
 	Ur UserRouter
+	Fr FileRouter
 }
 
-func NewIndexRouter(ur UserRouter) IndexRouter {
-	return indexRouter{ur}
+func NewIndexRouter(ur UserRouter, fr FileRouter) IndexRouter {
+	return indexRouter{ur, fr}
 }
 
 func (ir indexRouter) Routing(e *echo.Echo) {
