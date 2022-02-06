@@ -22,4 +22,5 @@ func NewIndexRouter(ur UserRouter, fr FileRouter) IndexRouter {
 func (ir indexRouter) Routing(e *echo.Echo) {
 	e.GET("/", controllers.Root)
 	ir.Ur.UserRouting(e)
+	ir.Fr.FileRouting(e)
 }
