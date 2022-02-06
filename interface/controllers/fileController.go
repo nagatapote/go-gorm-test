@@ -68,5 +68,5 @@ func (fc fileController) FileDownload(c echo.Context) (err error) {
 		}
 		return echo.NewHTTPError(statuscode, message)
 	}
-	return c.Blob(http.StatusOK, "image/jpeg", post)
+	return c.Blob(http.StatusOK, "multipart/form-data", post)
 }
