@@ -12,6 +12,7 @@ import (
 
 type UserController interface {
 	UserLogin(c echo.Context) (err error)
+	UserTotp(c echo.Context) (err error)
 	UserGetAll(c echo.Context) (err error)
 	UserCreate(c echo.Context) (err error)
 	UserUpdate(c echo.Context) (err error)
@@ -31,6 +32,10 @@ type (
 		Email    string `json:"email" validate:"required,email"`
 		Password string `json:"password" validate:"required,gte=8,password"`
 	}
+	usertotp struct {
+		Email string `json:"email" validate:"required,email"`
+		Totp string `json:"totp" validate:"required"`
+	}
 	userpost struct {
 		Email    string `json:"email" validate:"required,email"`
 		Password string `json:"password" validate:"required,gte=8,password"`
@@ -48,6 +53,22 @@ func (uc userController) UserLogin(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusBadRequest, util.ErrorNoParameter)
 	}
 	post, statuscode, err := uc.Cuu.UserLoginUseCase(ul.Email, ul.Password)
+	if err != nil {
+		message := models.Message{
+			Message: err.Error(),
+		}
+		return echo.NewHTTPError(statuscode, message)
+	}
+	return c.JSON(http.StatusOK, post)
+}
+
+func (uc userController) UserTotp(c echo.Context) (err error) {
+	ut := new(usertotp)
+	err = util.BindValidate(c, ut)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, util.ErrorNoParameter)
+	}
+	post, statuscode, err := uc.Cuu.UserTotpUseCase(ut.Email, ut.Totp)
 	if err != nil {
 		message := models.Message{
 			Message: err.Error(),

@@ -15,4 +15,6 @@ var (
 	ErrorDupricationError = errors.New("値が重複しています")
 	// ErrorNotAllowed error
 	ErrorNotAllowed = errors.New("権限が不足しています")
+	// ErrorEmailOrPassIsWrong error
+	ErrorTotpIsWrong = errors.New("ワンタイムパスワードが間違っています")
 )
