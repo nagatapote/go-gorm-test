@@ -30,6 +30,7 @@ func (ur userRouter) UserRouting(e *echo.Echo) {
 func (ur userRouter) userAuthRouting(e *echo.Echo) {
 	r := e.Group("/users")
 	r.POST("/login", ur.Uc.UserLogin)
+	r.POST("/totp", ur.Uc.UserTotp)
 }
 
 func (ur userRouter) userCertificationRouting(e *echo.Echo) {

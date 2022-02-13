@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	UserFindEmail(Email string) (*models.User, error)
 	UserFindID(ID string) (*models.User, error)
+	UserTotpUpdate(Email string, Secret string) (*models.User, error)
 	UserGetAll() (*[]models.User, error)
 	UserCreate(Email string, Password string) (*models.User, error)
 	UserUpdate(ID int, Email string, Password string) (*models.User, error)
@@ -38,6 +39,25 @@ func (ur *userRepositoryImpl) UserFindID(ID string) (*models.User, error) {
 		return nil, err
 	}
 	return &findUser, nil
+}
+
+func (ur *userRepositoryImpl) UserTotpUpdate(Email string, Secret string) (*models.User, error) {
+	findUser := models.User{}
+	err := ur.db.Where("email = ?", Email).First(&findUser).Error
+	if err != nil {
+		return nil, err
+	}
+	updateUserTotp := models.User{}
+	updateUserTotp.TotpSecret = Secret
+	err = ur.db.Model(&findUser).Update(&updateUserTotp).Error
+	if err != nil {
+		return nil, err
+	}
+	err = ur.db.Where("email = ?", Email).First(&findUser).Error
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
 }
 
 func (ur *userRepositoryImpl) UserGetAll() (*[]models.User, error) {
